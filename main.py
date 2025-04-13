@@ -1,3 +1,7 @@
+"""
+Primary front-end setup to run with streamlit
+"""
+
 from pathlib import Path
 import logging
 
@@ -38,8 +42,8 @@ with tabs[0]:
     query = db_tools.preset_query(filter_dict)
 
     if st.button("Show", key="run_predefined"):
-        logger.debug(f"Using filters:\n{filter_dict}")
-        logger.info(f"Running with predefined query:\n{query}")
+        logger.debug(f"Using filters: \n{filter_dict}")
+        logger.info(f"Running with predefined query: \n{query}")
         with dbconn as connection:
             df = connection.query_to_df(query)
 
