@@ -12,6 +12,7 @@ import streamlit as st
 
 logger = logging.getLogger(__name__)
 
+
 @st.cache_resource
 class DBConn:
     def __init__(self, db_path: Union[Path, str]):
@@ -45,9 +46,6 @@ class DBConn:
         df = pd.DataFrame(results, columns=columns)
         return df
 
-    def preset_query(self, date, party, cat, type, loss):
-        pass
-
 
 class data_options:
     def __init__(self, _db: DBConn):
@@ -76,3 +74,35 @@ class data_options:
             _, results = connection.run_query(sql)
         val_list = [item[0] for item in results]
         return val_list
+
+
+def generate_filter(col_name: str, selection: list) -> str:
+    if selection == [] or "ALL" in selection:
+        return ""
+    else:
+        values = [f"'{val}'" for val in selection]
+        return f" AND {col_name} in ({','.join(values)})"
+
+
+def sql_filters(filters: dict):
+    sql_filter = ""
+    for col, values in filters.items():
+        sql_filter += generate_filter(col, values)
+    return sql_filter
+
+
+def preset_query(filter_dict: dict):
+    base_query = """
+    SELECT as_of as "Date", 
+    party as "Belligerent", 
+    category_name as "Equipment Category",
+    type_name as "Equipment Type",
+    loss_type as "Loss Category",
+    count(proof_id) as "Count"
+    FROM loss_item
+    WHERE 1=1
+    """
+    group_by = """ GROUP BY as_of, party, category_name, type_name, loss_type"""
+    filters = sql_filters(filter_dict)
+    query = base_query + filters + group_by
+    return query
