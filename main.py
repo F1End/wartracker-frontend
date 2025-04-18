@@ -17,7 +17,8 @@ logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s
 st.set_page_config(page_title="War Tracker", layout="centered", )
 st.title("War Tracker v0.1")
 
-DB_PATH = Path("data", "wartracker.db")
+# DB_PATH = Path("data", "wartracker.db")
+DB_PATH = Path("dbtest_1.db")
 dbconn = db_tools.DBConn(DB_PATH)
 
 
