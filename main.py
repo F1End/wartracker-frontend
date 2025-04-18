@@ -70,7 +70,7 @@ with tabs[2]:
              " on the Russo-Ukrainian war in a more searchable/comparable manner. ")
     st.write("The site contains snapshots of losses from the Oryx's website. "
              "Each date in the database refers to the day when the loss was parsed from their pages. "
-             "After each parsing all data is re-uploded to the database. "
+             "After each parsing all data is re-uploaded to the database. "
              "Hence, if noone from Oryx made any changes between two parsing, two days data may entirely be identical."
              )
 
