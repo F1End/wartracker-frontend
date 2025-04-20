@@ -1,5 +1,5 @@
 """
-Primary front-end setup to run with streamlit
+Primary front-end setup to run with streamlit.
 """
 
 from pathlib import Path
