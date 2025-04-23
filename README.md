@@ -6,7 +6,7 @@ The app is available on https://wartracker.streamlit.app/
 ## Contents
 - [Description](#description)
 - [Requirements](#requirements)
-- [Installation and starting script](#Installation and starting script)
+- [Installation and run](#installation-and-run)
 - [Usage](#usage)
 
 ## Description
@@ -24,16 +24,12 @@ Be patient, Data will be extended in the future retroactively, but this will be 
 Mid-term plans include refactoring the database and adding more query options/help.<br>
 Long-term plans include extending coverage to other resources, e.g. pledges and other loss documenting sites.
 
-## Accessing the data
-
-
 ## Requirements
 The script uses python 3.13, but likely will work with most earlier versions after 3.8.
 
 The external library requirements are Streamlit and Pandas.
 
-## Installation and starting script
-
+## Installation and run
 1. Git clone repo
 2. Install requirements (and create venv if needed)
 3. Run via command line: <br>
@@ -51,9 +47,5 @@ that can be kicked off as a regular python script from your system or IDE: st_ru
 2. The default tab is "Predifined Queries". to filter based on listing or switch to "Direct SQL Query"
 to run your own queries.
 3. You can switch to tab "Direct SQL Query" if you want to run SQL queries written by yourself. 
-This gives way more flexibility but requires more technical aptitude.<br><br>
-    Structure of Data<br>
-The db contains three data tables:<br>
-'summary': Daily snapshot of the high level loss count.<br>
-'proofs': links to photo proofs of equipment losses. All data is unique in the table. Column 'id' can be connected to 'loss_item' table's 'proof_id' column.<br>
-'loss_item': Detailed daily snapshot of individual losses. Ship names below type/class level are removed on purpose.<br>
+This gives way more flexibility but requires more technical aptitude.
+4. There is further information on "SQL Query Help" and "Technical Details" tabs.
