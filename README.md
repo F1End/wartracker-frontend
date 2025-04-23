@@ -12,10 +12,14 @@ The app is available on https://wartracker.streamlit.app/
 ## Description
 Part of [Wartracker project](https://github.com/users/F1End/projects/1/views/1?pane=info).
 
+
 This is a Streamlit site that is used to access data processed and saved by upstream processes.
 SQLite is used for storage due to compatibility with free streamlit hosting solution.
 
 Currently configured display parse losses sourced from from Oryx's [Ukrainian](https://www.oryxspioenkop.com/2022/02/attack-on-europe-documenting-ukrainian.html) and [Russian](https://www.oryxspioenkop.com/2022/02/attack-on-europe-documenting-equipment.html) losses pages concerning the Russo-Ukrainian war.
+
+Although updates are running on daily bases, **note that data is available only since 1st of April, 2025**.
+Be patient, Data will be extended in the future retroactively, but this will be gradual.
 
 Mid-term plans include refactoring the database and adding more query options/help.<br>
 Long-term plans include extending coverage to other resources, e.g. pledges and other loss documenting sites.
