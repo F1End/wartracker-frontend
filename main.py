@@ -20,7 +20,6 @@ st.title("War Tracker v0.1")
 DB_PATH = Path("data", "wartracker.db")
 dbconn = db_tools.DBConn(DB_PATH)
 
-query_help = False
 
 # Tabs
 tabs = st.tabs(["Predefined Queries", "Direct SQL Query", "Direct SQL Help", "Information", "Technical Details"])
