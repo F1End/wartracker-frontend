@@ -56,19 +56,11 @@ with tabs[1]:
                               "SELECT name FROM sqlite_master WHERE type='table';"
                               "\n--you can comment out parts of the query with double-dash")
 
-    col1, col2 = st.columns(2)
-    # with col1:
     if st.button("Run Query", key="run_custom"):
         logger.info(f"Received user query: {user_query}")
         with dbconn as connection:
             df = connection.query_to_df(user_query)
-    # with col2:
-    #     if st.button("Query Help", key="query_help"):
-    #         logger.info(f"Triggering help: {user_query}")
-    #         query_help = True
-    #
-    #     if query_help:
-    #         st.write("Test 123")
+
         st.dataframe(df, hide_index=True)
 
 # Tab 3: Direct SQL Help
