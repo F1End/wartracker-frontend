@@ -20,9 +20,10 @@ st.title("War Tracker v0.1")
 DB_PATH = Path("data", "wartracker.db")
 dbconn = db_tools.DBConn(DB_PATH)
 
+query_help = False
 
 # Tabs
-tabs = st.tabs(["Predefined Queries", "Direct SQL Query", "Information", "Technical details"])
+tabs = st.tabs(["Predefined Queries", "Direct SQL Query", "Direct SQL Help", "Information", "Technical Details"])
 
 # Tab 1: Predefined Queries
 with tabs[0]:
@@ -56,18 +57,81 @@ with tabs[1]:
                               "SELECT name FROM sqlite_master WHERE type='table';"
                               "\n--you can comment out parts of the query with double-dash")
 
+    col1, col2 = st.columns(2)
+    # with col1:
     if st.button("Run Query", key="run_custom"):
         logger.info(f"Received user query: {user_query}")
         with dbconn as connection:
             df = connection.query_to_df(user_query)
-
+    # with col2:
+    #     if st.button("Query Help", key="query_help"):
+    #         logger.info(f"Triggering help: {user_query}")
+    #         query_help = True
+    #
+    #     if query_help:
+    #         st.write("Test 123")
         st.dataframe(df, hide_index=True)
 
-# Tab 3: General information/about
+# Tab 3: Direct SQL Help
 with tabs[2]:
+    st.subheader("SQL Help")
+    st.write("Here are some query examples you can get started with.")
+    st.write("Although is some information about the db structure on 'Technical Details tab', "
+             "concrete examples are usually more useful.")
+
+    st.write("")
+    st.write("1. Query to connect losses with the link to their proof, "
+             "while also filtering for 1st of April, for 'destroyed' vehicles in category 'tank':")
+    st.code("""
+            SELECT * FROM loss_item l 
+            INNER JOIN proofs p 
+            ON l.proof_id = p.id 
+            WHERE as_of = "2025-04-01" AND loss_type = "destroyed" AND category_name = "Tanks"
+            """, language="sql")
+
+    st.write("")
+    st.write("2. Query to count number of lost items "
+             "as of 1st of April, for 'destroyed' vehicles in category 'tank':")
+    st.code("""
+            SELECT party, type_name, count(*) FROM loss_item 
+            WHERE as_of = "2025-04-01" AND loss_type = "destroyed" AND category_name = "Tanks" 
+            GROUP BY party, type_name 
+            """, language="sql")
+
+    st.write("")
+    st.write("3. Query to count number of lost items "
+             "as of 1st of April, for 'destroyed' vehicles in category 'tank' "
+             "that have expression 'T-72' within their type name "
+             "(so basically lost T-72s:")
+    st.code("""
+            SELECT party, type_name, count(*) FROM loss_item 
+            WHERE as_of = "2025-04-01" AND loss_type = "destroyed" AND category_name = "Tanks" 
+            AND type_name like "%T-72%" 
+            GROUP BY party, type_name 
+            """, language="sql")
+
+    st.write("")
+    st.write("4. Query to count number of lost items "
+             "and group for each day for 'destroyed' vehicles in category 'tank' "
+             "that have expression 'T-80' within their type name "
+             "(so basically count of lost T-80s for each day). "
+             "Plus name last column accordingly:")
+    st.code("""
+            SELECT as_of,  party, count(*) as "all destroyed T-80" FROM loss_item 
+            WHERE loss_type = "destroyed" AND category_name = "Tanks" 
+            AND type_name like "%T-80%" 
+            GROUP BY as_of, party 
+            """, language="sql")
+
+# Tab 4: General information/about
+with tabs[3]:
     st.subheader("About")
     st.write("The goal of this site is to present the great work Oryx had been doing"
              " on the Russo-Ukrainian war in a more searchable/comparable manner. ")
+    st.write("Although updates are running on daily bases, "
+             "**note that data is available only since 1st of April, 2025**.")
+    st.write("Patience, data will be extended in the retroactively, "
+             "but this will be gradual and will take a couple of weeks.")
     st.write("The site contains snapshots of losses from the Oryx's website. "
              "Each date in the database refers to the day when the loss was parsed from their pages. "
              "After each parsing all data is re-uploaded to the database. "
@@ -85,16 +149,32 @@ with tabs[2]:
              " Should you notice any discrepancies, please reach out to me at @reddit "
              "or via the github profile presented on the Technical Details tab.")
 
-# Tab 4: Technical data about the db and project
-with tabs[3]:
+# Tab 5: Technical data about the db and project
+with tabs[4]:
     st.subheader("Structure of Data")
     st.markdown("The db contains three data tables:")
     st.markdown("1. 'summary': Daily snapshot of the high level loss count.")
     st.markdown("2. 'proofs': links to photo proofs of equipment losses."
                 " All data is unique in the table. "
                 "Column 'id' can be connected to 'loss_item' table's 'proof_id' column.")
-    st.markdown("3. 'loss_item': Detailed daily snapshot of individual losses."
-                " Ship names below type/class level are removed on purpose.")
+    st.markdown("3. 'loss_item': Detailed daily snapshot of individual losses. "
+                "Ship names below type/class level are removed on purpose. "
+                "The following columns are indexed: 'as_of', 'category_name', 'type_name', 'loss_type'")
 
     st.subheader("Pipeline elements")
-    st.markdown("TBD")
+    st.markdown("Orchestration with Apache Airflow: [airflow-dags](https://github.com/F1End/airflow-dags)")
+
+    st.markdown("Fetching and QC of web data: [webfetcher](https://github.com/F1End/webfetcher)")
+
+    st.markdown("Parsing html into csv with beautifulsoup: [parsehtml](https://github.com/F1End/parsehtml)")
+
+    st.markdown("Processing csv data into db tables with Pyspark: "
+                "[longrow_to_db](https://github.com/F1End/longrow_to_db)")
+
+    st.markdown("Access to data with Streamlit (this website) (hosted on Community Cloud): "
+                "[wartracker-frontend](https://github.com/F1End/wartracker-frontend)")
+    st.markdown("[Link to website](https://wartracker.streamlit.app/)")
+    image_path = Path("images", "WarTracker_High level.jpg")
+    # st.markdown(f"![image]({image_path.as_posix()})")
+    # st.markdown("![Image](https://github.com/user-attachments/assets/e72a1fd2-f36b-4e3f-ba97-7aabfb32ba33)")
+    st.image(image_path)
