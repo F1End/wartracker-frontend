@@ -165,7 +165,7 @@ with tabs[4]:
     st.markdown("Access to data with Streamlit (this website) (hosted on Community Cloud): "
                 "[wartracker-frontend](https://github.com/F1End/wartracker-frontend)")
     st.markdown("[Link to website](https://wartracker.streamlit.app/)")
-    image_path = Path("images", "WarTracker_High level.jpg")
+    image_path = Path("WarTracker_High level.jpg")
     # st.markdown(f"![image]({image_path.as_posix()})")
     # st.markdown("![Image](https://github.com/user-attachments/assets/e72a1fd2-f36b-4e3f-ba97-7aabfb32ba33)")
     st.image(image_path)
