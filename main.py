@@ -83,9 +83,7 @@ with tabs[0]:
             query_2 = db_tools.dod_query(filter_dict, group_by, selected_date_2)
 
             if st.button("Show", key="run_predefined"):
-                st.write("asdasd")
                 logger.debug(f"Using filters: \n{filter_dict}")
-                st.write(f"Using filters: \n{filter_dict}")
                 with dbconn as connection:
                     logger.info(f"Running with dod query: \n{query_1}")
                     df_1 = connection.query_to_df(query_1)
