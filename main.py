@@ -67,7 +67,7 @@ with tabs[0]:
             selected_belligerents = st.selectbox("Belligerent", ["Ukraine", "Russia"])
             group_by = st.selectbox("Group data by", ["Category", "Type", "Loss type"])
 
-            filter_dict = {}
+            filter_dict = {"party": [selected_belligerents]}
 
             if st.toggle("Detail filters", key="show_filter_tier_2"):
                 selected_categories = st.multiselect("Equipment Category", options.categories,
