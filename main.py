@@ -5,6 +5,7 @@ Primary front-end setup to run with streamlit.
 from pathlib import Path
 import logging
 
+import pandas as pd
 import streamlit as st
 
 from src import db_tools
@@ -28,26 +29,74 @@ tabs = st.tabs(["Predefined Queries", "Direct SQL Query", "Direct SQL Help", "In
 with tabs[0]:
     st.subheader("Predefined Query Filters")
 
+    query_option = st.selectbox("Select query type", ["Day over day comparison", "General Filter"])
+
     options = db_tools.data_options(dbconn)
     options.load_data()
 
-    selected_date = st.multiselect("Date", options.dates, default=options.dates[-1])
-    selected_belligerents = st.multiselect("Belligerent", options.belligerents, default=options.belligerents[-1])
-    selected_categories = st.multiselect("Equipment Category", options.categories, default=options.categories[-1])
-    selected_types = st.multiselect("Equipment Type", options.types, default=options.types[-1])
-    selected_loss_types = st.multiselect("Loss Category", options.loss_types, default=options.loss_types[-1])
-    filter_dict = {"as_of": selected_date, "party": selected_belligerents,
-                   "category_name": selected_categories, "type_name": selected_types,
-                   "loss_type": selected_loss_types}
-    query = db_tools.preset_query(filter_dict)
+    container_general_filter = st.container()
+    container_dod_comparision = st.container()
 
-    if st.button("Show", key="run_predefined"):
-        logger.debug(f"Using filters: \n{filter_dict}")
-        logger.info(f"Running with predefined query: \n{query}")
-        with dbconn as connection:
-            df = connection.query_to_df(query)
+    # Query type one: General Filter
+    if query_option == "General Filter":
+        with container_general_filter:
 
-        st.dataframe(df, hide_index=True)
+            selected_date = st.multiselect("Date", options.dates, default=options.dates[-1])
+            selected_belligerents = st.multiselect("Belligerent", options.belligerents, default=options.belligerents[-1])
+            selected_categories = st.multiselect("Equipment Category", options.categories, default=options.categories[-1])
+            selected_types = st.multiselect("Equipment Type", options.types, default=options.types[-1])
+            selected_loss_types = st.multiselect("Loss Category", options.loss_types, default=options.loss_types[-1])
+            filter_dict = {"as_of": selected_date, "party": selected_belligerents,
+                           "category_name": selected_categories, "type_name": selected_types,
+                           "loss_type": selected_loss_types}
+            query = db_tools.preset_query(filter_dict)
+
+            if st.button("Show", key="run_predefined"):
+                logger.debug(f"Using filters: \n{filter_dict}")
+                logger.info(f"Running with predefined query: \n{query}")
+                with dbconn as connection:
+                    df = connection.query_to_df(query)
+
+                st.dataframe(df, hide_index=True)
+
+    # Query type two: Day comparison
+    elif query_option == "Day over day comparison":
+        with container_dod_comparision:
+            selected_date_1 = st.selectbox("Date #1", options.dates, index=len(options.dates)-1)
+            selected_date_2 = st.selectbox("Date #2", options.dates, index=0)
+            selected_belligerents = st.selectbox("Belligerent", ["Ukraine", "Russia"])
+            group_by = st.selectbox("Group data by", ["Category", "Type", "Loss type"])
+
+            filter_dict = {}
+
+            if st.toggle("Detail filters", key="show_filter_tier_2"):
+                selected_categories = st.multiselect("Equipment Category", options.categories,
+                                                     default=options.categories[-1])
+                selected_types = st.multiselect("Equipment Type", options.types, default=options.types[-1])
+                selected_loss_types = st.multiselect("Loss Category", options.loss_types,
+                                                     default=options.loss_types[-1])
+                filter_dict["category_name"] = selected_categories
+                filter_dict["type_name"] = selected_types
+                filter_dict["loss_type"] = selected_loss_types
+
+            query_1 = db_tools.dod_query(filter_dict, group_by, selected_date_1)
+            query_2 = db_tools.dod_query(filter_dict, group_by, selected_date_2)
+
+            if st.button("Show", key="run_predefined"):
+                st.write("asdasd")
+                logger.debug(f"Using filters: \n{filter_dict}")
+                st.write(f"Using filters: \n{filter_dict}")
+                with dbconn as connection:
+                    logger.info(f"Running with dod query: \n{query_1}")
+                    df_1 = connection.query_to_df(query_1)
+                    logger.info(f"Running with dod query: \n{query_2}")
+                    df_2 = connection.query_to_df(query_2)
+
+                join_cols = df_1.columns[:-1].tolist()
+                merged_df = pd.merge(df_1, df_2, on=join_cols, how="outer")
+                merged_df = merged_df.fillna(0)
+                merged_df["Change"] = merged_df[selected_date_1] - merged_df[selected_date_2]
+                st.dataframe(merged_df)
 
 # Tab 2: Direct SQL Query
 with tabs[1]:

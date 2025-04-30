@@ -91,7 +91,7 @@ def sql_filters(filters: dict):
     return sql_filter
 
 
-def preset_query(filter_dict: dict):
+def preset_query(filter_dict: dict) -> str:
     base_query = """
     SELECT as_of as "Date", 
     party as "Belligerent", 
@@ -105,4 +105,18 @@ def preset_query(filter_dict: dict):
     group_by = """ GROUP BY as_of, party, category_name, type_name, loss_type"""
     filters = sql_filters(filter_dict)
     query = base_query + filters + group_by
+    return query
+
+
+def dod_query(filter_dict: dict, groups: str, date: str) -> str:
+    groups_statement = {"Category": "category_name",
+                      "Type": "category_name, type_name",
+                      "Loss type": "category_name, type_name, loss_type"}
+    groups = groups_statement[groups]
+    filters = sql_filters(filter_dict)
+
+    query = "SELECT " + groups + f", count(*) as '{date}'" + \
+            " FROM loss_item WHERE 1=1 " + filters + f" AND as_of = '{date}'"\
+            " GROUP BY " + groups
+
     return query
